@@ -214,7 +214,6 @@ enum ftdi_module_detach_mode
 #define SIO_RESET_PURGE_RX _Ftdi_Pragma("GCC warning \"SIO_RESET_PURGE_RX\" deprecated: - use tciflush() method") 1
 #define SIO_RESET_PURGE_TX _Ftdi_Pragma("GCC warning \"SIO_RESET_PURGE_RX\" deprecated: - use tcoflush() method") 2
 #else
-#pragma message("WARNING: You need to implement deprecated #define for this compiler")
 #define SIO_RESET_PURGE_RX 1
 #define SIO_RESET_PURGE_TX 2
 #endif
@@ -561,9 +560,9 @@ extern "C"
     int ftdi_tciflush(struct ftdi_context *ftdi);
     int ftdi_tcoflush(struct ftdi_context *ftdi);
     int ftdi_tcioflush(struct ftdi_context *ftdi);
-    int DEPRECATED(ftdi_usb_purge_rx_buffer(struct ftdi_context *ftdi));
-    int DEPRECATED(ftdi_usb_purge_tx_buffer(struct ftdi_context *ftdi));
-    int DEPRECATED(ftdi_usb_purge_buffers(struct ftdi_context *ftdi));
+    int ftdi_usb_purge_rx_buffer(struct ftdi_context *ftdi);
+    int ftdi_usb_purge_tx_buffer(struct ftdi_context *ftdi);
+    int ftdi_usb_purge_buffers(struct ftdi_context *ftdi);
 
     int ftdi_set_baudrate(struct ftdi_context *ftdi, int baudrate);
     int ftdi_set_line_property(struct ftdi_context *ftdi, enum ftdi_bits_type bits,
