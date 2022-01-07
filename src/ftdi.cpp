@@ -17,7 +17,6 @@
  */
 
 #include "libwinftdi.h"
-#include <winsock2.h>
 #include <ftdi.h>
 
 using namespace LibWinFtdi;

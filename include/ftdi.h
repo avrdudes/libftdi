@@ -30,16 +30,21 @@
 #define _Ftdi_Pragma(_msg) _Pragma(_msg)
 #endif
 
-/* 'interface' might be defined as a macro on Windows, so we need to
- * undefine it so as not to break the current libftdi API, because
- * struct ftdi_context has an 'interface' member
- * As this can be problematic if you include windows.h after ftdi.h
- * in your sources, we force windows.h to be included first. */
 #if defined(_WIN32) || defined(__CYGWIN__) || defined(_WIN32_WCE)
-#include <windows.h>
-#if defined(interface)
-#undef interface
-#endif
+
+// If you need both <windows.h> and <sys/time.h>,
+// make sure you include <windows.h> first.
+#ifndef _WINSOCKAPI_
+#ifndef _TIMEVAL_DEFINED
+#define _TIMEVAL_DEFINED
+struct timeval
+{
+    long tv_sec;
+    long tv_usec;
+};
+#endif /* _TIMEVAL_DEFINED */
+#endif /* _WINSOCKAPI_ */
+
 #endif
 
 /** FTDI chip type */
