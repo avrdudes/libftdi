@@ -53,6 +53,23 @@ namespace LibWinFtdi
         FT_DEVICE_2232H,
         FT_DEVICE_4232H,
         FT_DEVICE_232H,
+        FT_DEVICE_X_SERIES,
+        FT_DEVICE_4222H_0,
+        FT_DEVICE_4222H_1_2,
+        FT_DEVICE_4222H_3,
+        FT_DEVICE_4222_PROG,
+        FT_DEVICE_900,
+        FT_DEVICE_930,
+        FT_DEVICE_UMFTPD3A,
+        FT_DEVICE_2233HP,
+        FT_DEVICE_4233HP,
+        FT_DEVICE_2232HP,
+        FT_DEVICE_4232HP,
+        FT_DEVICE_233HP,
+        FT_DEVICE_232HP,
+        FT_DEVICE_2232HA,
+        FT_DEVICE_4232HA,
+        FT_DEVICE_232RN,
     };
 
     enum
@@ -298,7 +315,13 @@ namespace LibWinFtdi
             {
             case FT_DEVICE_2232C:
             case FT_DEVICE_2232H:
+            case FT_DEVICE_2232HA:
+            case FT_DEVICE_2232HP:
+            case FT_DEVICE_2233HP:
             case FT_DEVICE_4232H:
+            case FT_DEVICE_4232HA:
+            case FT_DEVICE_4232HP:
+            case FT_DEVICE_4233HP:
                 return true;
             default:
                 return false;

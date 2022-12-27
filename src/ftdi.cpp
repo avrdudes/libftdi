@@ -21,9 +21,9 @@
 
 using namespace LibWinFtdi;
 
-static ftdi_chip_type MapChipType(ULONG type)
+static ftdi_chip_type MapChipType(DWORD dwType)
 {
-    switch (type)
+    switch (dwType)
     {
     case FT_DEVICE_BM:
         return TYPE_BM;
@@ -34,13 +34,24 @@ static ftdi_chip_type MapChipType(ULONG type)
     case FT_DEVICE_2232C:
         return TYPE_2232C;
     case FT_DEVICE_232R:
+    case FT_DEVICE_232RN:
         return TYPE_R;
     case FT_DEVICE_2232H:
+    case FT_DEVICE_2232HA:
+    case FT_DEVICE_2232HP:
+    case FT_DEVICE_2233HP:
         return TYPE_2232H;
     case FT_DEVICE_4232H:
+    case FT_DEVICE_4232HA:
+    case FT_DEVICE_4232HP:
+    case FT_DEVICE_4233HP:
         return TYPE_4232H;
     case FT_DEVICE_232H:
+    case FT_DEVICE_232HP:
+    case FT_DEVICE_233HP:
         return TYPE_232H;
+    case FT_DEVICE_X_SERIES:
+        return TYPE_230X;
     default:
         return TYPE_AM;
     }
