@@ -153,19 +153,19 @@ int ftdi_usb_open_desc_index(struct ftdi_context* ftdi, int vendor, int product,
 
     for (auto const& info : enumerator.GetDevices())
     {
-        if ((info.Flags & FT_FLAGS_OPENED) != 0)
+        if ((info.dwFlags & FT_FLAGS_OPENED) != 0)
             continue;
 
-        if (vendor != static_cast<uint16_t>(info.ID >> 16))
+        if (vendor != static_cast<uint16_t>(info.dwID >> 16))
             continue;
 
-        if (product != static_cast<uint16_t>(info.ID >> 0))
+        if (product != static_cast<uint16_t>(info.dwID >> 0))
             continue;
 
-        if (description != nullptr && strcmp(description, info.Description) != 0)
+        if (description != nullptr && strcmp(description, info.acDescription) != 0)
             continue;
 
-        if (serial != nullptr && strcmp(serial, info.SerialNumber) != 0)
+        if (serial != nullptr && strcmp(serial, info.acSerialNumber) != 0)
             continue;
 
         if (index > 0)
@@ -175,7 +175,7 @@ int ftdi_usb_open_desc_index(struct ftdi_context* ftdi, int vendor, int product,
         }
 
         auto device = std::make_unique<FtdiDevice>();
-        FT_STATUS status = device->OpenBySerialNumber(info.SerialNumber);
+        FT_STATUS status = device->OpenBySerialNumber(info.acSerialNumber);
         if (status == FT_OK)
         {
             device->ResetDevice();
@@ -190,7 +190,7 @@ int ftdi_usb_open_desc_index(struct ftdi_context* ftdi, int vendor, int product,
             return SetError(ftdi, -3, "failed to open device");
         }
 
-        ftdi->type = MapChipType(info.Type);
+        ftdi->type = MapChipType(info.dwType);
         ftdi->usb_dev = reinterpret_cast<struct libusb_device_handle*>(device.release());
         return 0;
     }

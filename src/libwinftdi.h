@@ -86,13 +86,13 @@ namespace LibWinFtdi
 
     struct DeviceInfo
     {
-        ULONG Flags;
-        ULONG Type;
-        ULONG ID;
-        DWORD LocId;
-        char SerialNumber[16];
-        char Description[64];
-        FT_HANDLE ftHandle;
+        DWORD dwFlags = 0;
+        DWORD dwType = 0;
+        DWORD dwID = 0;
+        DWORD dwLocId = 0;
+        char acSerialNumber[16] = { 0 };
+        char acDescription[64] = { 0 };
+        FT_HANDLE ftHandle = nullptr;
     };
 
     class FtdiApi
@@ -122,7 +122,7 @@ namespace LibWinFtdi
 
             HRESULT hr = S_OK;
             if (FAILED(hr = LoadImport(module, "FT_CreateDeviceInfoList", &FT_CreateDeviceInfoList)) ||
-                FAILED(hr = LoadImport(module, "FT_GetDeviceInfoList", &FT_GetDeviceInfoList)) ||
+                FAILED(hr = LoadImport(module, "FT_GetDeviceInfoDetail", &FT_GetDeviceInfoDetail)) ||
                 FAILED(hr = LoadImport(module, "FT_OpenEx", &FT_OpenEx)) ||
                 FAILED(hr = LoadImport(module, "FT_Close", &FT_Close)) ||
                 FAILED(hr = LoadImport(module, "FT_ResetDevice", &FT_ResetDevice)) ||
@@ -179,7 +179,15 @@ namespace LibWinFtdi
 
     protected:
         FT_STATUS(WINAPI* FT_CreateDeviceInfoList)(LPDWORD lpdwNumDevs) = nullptr;
-        FT_STATUS(WINAPI* FT_GetDeviceInfoList)(DeviceInfo* pDest, LPDWORD lpdwNumDevs) = nullptr;
+        FT_STATUS(WINAPI* FT_GetDeviceInfoDetail)(
+            DWORD dwIndex,
+            LPDWORD lpdwFlags,
+            LPDWORD lpdwType,
+            LPDWORD lpdwID,
+            LPDWORD lpdwLocId,
+            LPVOID lpSerialNumber,
+            LPVOID lpDescription,
+            FT_HANDLE* pftHandle) = nullptr;
         FT_STATUS(WINAPI* FT_OpenEx)(PVOID pArg1, DWORD Flags, FT_HANDLE* pHandle) = nullptr;
         FT_STATUS(WINAPI* FT_Close)(FT_HANDLE ftHandle) = nullptr;
         FT_STATUS(WINAPI* FT_ResetDevice)(FT_HANDLE ftHandle) = nullptr;
@@ -215,16 +223,28 @@ namespace LibWinFtdi
                 return FT_INVALID_HANDLE;
             }
 
-            DWORD lpdwNumDevs = 0;
-            FT_STATUS status = FT_CreateDeviceInfoList(&lpdwNumDevs);
+            DWORD dwNumDevs = 0;
+            FT_STATUS status = FT_CreateDeviceInfoList(&dwNumDevs);
             if (status != FT_OK)
                 return status;
 
-            m_devices.resize(lpdwNumDevs);
-
-            status = FT_GetDeviceInfoList(m_devices.data(), &lpdwNumDevs);
-            if (status != FT_OK)
-                return status;
+            for (DWORD i = 0; i < dwNumDevs; i++)
+            {
+                DeviceInfo device;
+                status = FT_GetDeviceInfoDetail(
+                    i,
+                    &device.dwFlags,
+                    &device.dwType,
+                    &device.dwID,
+                    &device.dwLocId,
+                    device.acSerialNumber,
+                    device.acDescription,
+                    &device.ftHandle);
+                if (status == FT_OK)
+                {
+                    m_devices.push_back(device);
+                }
+            }
 
             return FT_OK;
         }
