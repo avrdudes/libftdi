@@ -90,7 +90,9 @@ namespace LibWinFtdi
         DWORD dwType = 0;
         DWORD dwID = 0;
         DWORD dwLocId = 0;
+        int nInterface = 0;
         char acSerialNumber[16] = { 0 };
+        char acPortSerialNumber[16] = { 0 };
         char acDescription[64] = { 0 };
         FT_HANDLE ftHandle = nullptr;
     };
@@ -242,6 +244,41 @@ namespace LibWinFtdi
                     &device.ftHandle);
                 if (status == FT_OK)
                 {
+                    std::memcpy(device.acPortSerialNumber, device.acSerialNumber, sizeof(device.acSerialNumber));
+
+                    if (HasMultipleInterfaces(device.dwType))
+                    {
+                        size_t nSerialNumberLength = strlen(device.acSerialNumber);
+                        if (nSerialNumberLength > 0)
+                        {
+                            nSerialNumberLength--;
+
+                            char chLast = device.acSerialNumber[nSerialNumberLength];
+                            if (chLast >= 'A' && chLast <= 'D')
+                            {
+                                device.nInterface = chLast - 'A';
+                                device.acSerialNumber[nSerialNumberLength] = 0;
+                            }
+                        }
+
+                        size_t nDescriptionLength = strlen(device.acDescription);
+                        if (nDescriptionLength > 0)
+                        {
+                            nDescriptionLength--;
+
+                            char chLast = device.acDescription[nDescriptionLength];
+                            if (chLast >= 'A' && chLast <= 'D')
+                            {
+                                if (nDescriptionLength > 0 && device.acDescription[nDescriptionLength - 1] == ' ')
+                                {
+                                    nDescriptionLength--;
+                                }
+
+                                device.acDescription[nDescriptionLength] = 0;
+                            }
+                        }
+                    }
+
                     m_devices.push_back(device);
                 }
             }
@@ -252,6 +289,20 @@ namespace LibWinFtdi
         const std::vector<DeviceInfo>& GetDevices() const
         {
             return m_devices;
+        }
+
+    private:
+        static bool HasMultipleInterfaces(DWORD dwType)
+        {
+            switch (dwType)
+            {
+            case FT_DEVICE_2232C:
+            case FT_DEVICE_2232H:
+            case FT_DEVICE_4232H:
+                return true;
+            default:
+                return false;
+            }
         }
 
     private:

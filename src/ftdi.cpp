@@ -168,6 +168,9 @@ int ftdi_usb_open_desc_index(struct ftdi_context* ftdi, int vendor, int product,
         if (serial != nullptr && strcmp(serial, info.acSerialNumber) != 0)
             continue;
 
+        if (ftdi->interface != info.nInterface)
+            continue;
+
         if (index > 0)
         {
             index--;
@@ -175,7 +178,7 @@ int ftdi_usb_open_desc_index(struct ftdi_context* ftdi, int vendor, int product,
         }
 
         auto device = std::make_unique<FtdiDevice>();
-        FT_STATUS status = device->OpenBySerialNumber(info.acSerialNumber);
+        FT_STATUS status = device->OpenBySerialNumber(info.acPortSerialNumber);
         if (status == FT_OK)
         {
             device->ResetDevice();
